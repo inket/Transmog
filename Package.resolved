@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "swift-argument-parser",
+        "repositoryURL": "https://github.com/apple/swift-argument-parser",
+        "state": {
+          "branch": null,
+          "revision": "9f04d1ff1afbccd02279338a2c91e5f27c45e93a",
+          "version": "0.0.5"
+        }
+      },
+      {
+        "package": "SwiftHEXColors",
+        "repositoryURL": "https://github.com/thii/SwiftHEXColors",
+        "state": {
+          "branch": null,
+          "revision": "bf89f80ed03a7a55edf0beb6a6bcadd41a913f9d",
+          "version": "1.4.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
