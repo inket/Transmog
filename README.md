@@ -27,7 +27,29 @@ Saved as "(t)Noctis Azureus"
 
 ## A few examples
 
+#### [HackTheBox](https://github.com/silofy/hackthebox)
 
+Original                   | Transmog
+:-------------------------:|:-------------------------:
+<img src="Preview/hackthebox-original.png" width="440" />  |  <img src="Preview/hackthebox.png" width="440" />
+
+#### [Night Owl](https://github.com/sdras/night-owl-vscode-theme)
+
+Original                   | Transmog
+:-------------------------:|:-------------------------:
+<img src="Preview/night-owl-original.jpg" width="440" />   |  <img src="Preview/night-owl.png" width="440" />
+
+#### [Noctis (Azureus)](https://github.com/liviuschera/noctis)
+
+Original                   | Transmog
+:-------------------------:|:-------------------------:
+<img src="Preview/noctis-azureus-original.png" width="380" />   |  <img src="Preview/noctis-azureus.png" width="500" />
+
+#### [Tokyo Night](https://github.com/enkia/tokyo-night-vscode-theme)
+
+Original                   | Transmog
+:-------------------------:|:-------------------------:
+<img src="Preview/tokyo-night-original.png" width="440" />   |  <img src="Preview/tokyo-night.png" width="440" />
 
 ## Considerations
 
