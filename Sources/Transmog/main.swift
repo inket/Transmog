@@ -45,7 +45,7 @@ struct Transmog: ParsableCommand {
         ConversionParameters.skipColorProfileCorrection = skipColorProfileCorrection
 
         // Load the theme file
-        let vscodeTheme = try VSCodeTheme.read(fromURL: pathOrURL)
+        let vscodeTheme = try VSCodeTheme.read(fromPathOrURL: pathOrURL)
 
         // Convert it
         guard let xcodeTheme = XcodeTheme.from(vscodeTheme.colors) else {

@@ -17,18 +17,18 @@ protocol Theme {
 }
 
 extension Theme {
-    static func read(fromURL urlString: String) throws -> Self {
-        guard let url = URL(string: urlString) else {
-            throw TransmogError.invalidURL
+    static func read(fromPathOrURL pathOrURL: String) throws -> Self {
+        if pathOrURL.isNetworkURL {
+            guard let url = URL(string: pathOrURL) else {
+                throw TransmogError.invalidURL
+            }
+
+            let data = try Data(contentsOf: url)
+            return try read(from: data)
+        } else {
+            let data = try Data(contentsOf: URL(fileURLWithPath: pathOrURL))
+            return try read(from: data)
         }
-
-        let data = try Data(contentsOf: url)
-        return try read(from: data)
-    }
-
-    static func read(fromPath path: String) throws -> Self {
-        let data = try Data(contentsOf: URL(fileURLWithPath: path))
-        return try read(from: data)
     }
 
     func save(toPath path: String) throws {
