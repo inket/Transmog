@@ -19,7 +19,7 @@ protocol Theme {
 extension Theme {
     static func read(fromPathOrURL pathOrURL: String) throws -> Self {
         if pathOrURL.isNetworkURL {
-            guard let url = URL(string: pathOrURL) else {
+            guard let url = URL(string: URLExpander.expandedURL(pathOrURL)) else {
                 throw TransmogError.invalidURL
             }
 

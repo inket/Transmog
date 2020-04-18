@@ -21,8 +21,7 @@ struct Transmog: ParsableCommand {
         help: ArgumentHelp(
             "Path or URL of the VSCode theme file (.json). GitHub links are also supported.",
             valueName: "theme-file-path-or-url"
-        ),
-        transform: { URLExpander.expandedURL($0) }
+        )
     )
     var pathOrURL: String
 
