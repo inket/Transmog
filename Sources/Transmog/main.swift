@@ -13,7 +13,7 @@ enum ConversionParameters {
 struct Transmog: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "transmog",
-        abstract: "A command-line tool to convert VSCode theme files into Xcode theme files"
+        abstract: "A command-line tool for converting VSCode themes files into Xcode theme files"
     )
 
     @Argument(
