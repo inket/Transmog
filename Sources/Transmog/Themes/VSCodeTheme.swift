@@ -40,7 +40,7 @@ struct VSCodeTheme: Theme {
 
         return Colors(
             background: color(forKey: "editor.background") ?? defaultBackground,
-            currentLineBackground: color(forKey: ""),
+            currentLineBackground: color(forKey: "editor.lineHighlightBackground"),
             selection: color(forKey: "editor.selectionBackground"),
             cursor: color(forKey: "editorCursor.foreground"),
             invisibles: color(forKey: "editorWhitespace.foreground"),
