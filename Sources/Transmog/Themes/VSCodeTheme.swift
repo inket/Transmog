@@ -75,11 +75,7 @@ struct VSCodeTheme: Theme {
             throw TransmogError.invalidInput
         }
 
-        // VSCode allows theme json files to have comments for some reason… let's delete them
-        let sanitizedJSON = try JSONSanitizer.sanitizedJSON(for: rawJSON)
-        let sanitizedJSONData = sanitizedJSON.data(using: .utf8)!
-
-        let content = try JSONDecoder().decode(Content.self, from: sanitizedJSONData)
+        let content = try LenientJSONDecoder.decode(Content.self, from: rawJSON)
         return VSCodeTheme(content: content)
     }
 
