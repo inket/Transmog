@@ -17,6 +17,7 @@ struct Transmog: ParsableCommand {
     )
 
     @Argument(
+        // default: "~/Desktop/theme.json", // uncomment for testing within Xcode
         help: ArgumentHelp(
             "Path or URL of the VSCode theme file (.json). GitHub links are also supported.",
             valueName: "theme-file-path-or-url"
