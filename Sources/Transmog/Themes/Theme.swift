@@ -26,7 +26,8 @@ extension Theme {
             let data = try Data(contentsOf: url)
             return try read(from: data)
         } else {
-            let data = try Data(contentsOf: URL(fileURLWithPath: pathOrURL))
+            let expandedPath = (pathOrURL as NSString).expandingTildeInPath
+            let data = try Data(contentsOf: URL(fileURLWithPath: expandedPath))
             return try read(from: data)
         }
     }

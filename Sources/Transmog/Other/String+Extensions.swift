@@ -12,7 +12,9 @@ extension String {
         switch urlComponents.scheme {
         case "http", "https": return true
         case "file": return false
-        case .none: return !FileManager.default.fileExists(atPath: self)
+        case .none:
+            let expandedPath = (self as NSString).expandingTildeInPath
+            return !FileManager.default.fileExists(atPath: expandedPath)
         default: return false
         }
     }
