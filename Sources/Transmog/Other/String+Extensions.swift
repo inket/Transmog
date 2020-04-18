@@ -9,7 +9,7 @@ extension String {
     var isNetworkURL: Bool {
         guard let urlComponents = URLComponents(string: self) else { return false }
 
-        switch urlComponents.host {
+        switch urlComponents.scheme {
         case "http", "https": return true
         case "file": return false
         case .none: return !FileManager.default.fileExists(atPath: self)
