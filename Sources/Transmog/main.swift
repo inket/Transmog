@@ -52,6 +52,8 @@ struct Transmog: ParsableCommand {
             throw TransmogError.couldNotCreateTheme
         }
 
+        xcodeTheme.content.printValues()
+
         // Figure out the theme name
         var themeName = vscodeTheme.content.name ?? pathOrURL.lastPathComponentWithoutPathExtension
         themeName = themeName.removingPercentEncoding ?? themeName

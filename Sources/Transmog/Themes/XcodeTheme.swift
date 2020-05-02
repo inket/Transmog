@@ -7,53 +7,50 @@ import Foundation
 import AppKit
 
 extension NSColor {
-    fileprivate var string: String {
-        // Xcode uses generic RGB for rendering the colors
-        let color = usingColorSpace(.genericRGB) ?? self
-        
-        return "\(color.redComponent) \(color.greenComponent) \(color.blueComponent) \(color.alphaComponent)"
+    var asXcodeColor: XcodeTheme.Color {
+        XcodeTheme.Color(rawColor: self)
     }
 }
 
 struct XcodeTheme: Theme {
     static func from(_ colors: Colors) -> XcodeTheme? {
-        let background = colors.background.string
-        let foreground = colors.text.string
+        let background = colors.background.asXcodeColor
+        let foreground = colors.text.asXcodeColor
 
         return XcodeTheme(
             content: Content(
-                background: colors.background.string,
-                currentLineBackground: colors.currentLineBackground?.string ?? background,
-                selection: colors.selection?.string,
-                cursor: colors.cursor?.string,
-                invisibles: colors.invisibles?.string,
+                background: colors.background.asXcodeColor,
+                currentLineBackground: colors.currentLineBackground?.asXcodeColor ?? background,
+                selection: colors.selection?.asXcodeColor,
+                cursor: colors.cursor?.asXcodeColor,
+                invisibles: colors.invisibles?.asXcodeColor,
                 syntaxColors: SyntaxColors(
-                    text: colors.text.string,
-                    comment: colors.comment?.string,
-                    documentation: colors.documentation?.string,
-                    documentationKeyword: colors.documentation?.string,
-                    mark: colors.documentation?.string ?? colors.comment?.string,
-                    string: colors.string?.string,
-                    character: colors.character?.string,
-                    number: colors.number?.string,
-                    keyword: colors.keyword?.string,
-                    preprocessor: colors.preprocessor?.string,
-                    url: colors.documentation?.string,
+                    text: colors.text.asXcodeColor,
+                    comment: colors.comment?.asXcodeColor,
+                    documentation: colors.documentation?.asXcodeColor,
+                    documentationKeyword: colors.documentation?.asXcodeColor,
+                    mark: colors.documentation?.asXcodeColor ?? colors.comment?.asXcodeColor,
+                    string: colors.string?.asXcodeColor,
+                    character: colors.character?.asXcodeColor,
+                    number: colors.number?.asXcodeColor,
+                    keyword: colors.keyword?.asXcodeColor,
+                    preprocessor: colors.preprocessor?.asXcodeColor,
+                    url: colors.documentation?.asXcodeColor,
                     attribute: foreground,
-                    declarationType: colors.declarationType?.string,
-                    declarationOther: colors.declarationOther?.string,
-                    classNameProject: colors.classNameProject?.string,
-                    functionNameProject: colors.functionNameProject?.string,
-                    constantProject: colors.constantProject?.string,
-                    typeNameProject: colors.typeNameProject?.string,
-                    instanceVariableProject: colors.variable?.string,
-                    preprocessorMacroProject: colors.preprocessor?.string,
-                    classNameOther: colors.classNameLibrary?.string,
-                    functionNameOther: colors.functionNameLibrary?.string,
-                    constantOther: colors.constantLibrary?.string,
-                    typeNameOther: colors.typeNameLibrary?.string,
-                    instanceVariableOther: colors.variable?.string,
-                    preprocessorMacroOther: colors.preprocessor?.string
+                    declarationType: colors.declarationType?.asXcodeColor,
+                    declarationOther: colors.declarationOther?.asXcodeColor,
+                    classNameProject: colors.classNameProject?.asXcodeColor,
+                    functionNameProject: colors.functionNameProject?.asXcodeColor,
+                    constantProject: colors.constantProject?.asXcodeColor,
+                    typeNameProject: colors.typeNameProject?.asXcodeColor,
+                    instanceVariableProject: colors.variableAndGlobalProject?.asXcodeColor,
+                    preprocessorMacroProject: colors.preprocessor?.asXcodeColor,
+                    classNameOther: colors.classNameLibrary?.asXcodeColor,
+                    functionNameOther: colors.functionNameLibrary?.asXcodeColor,
+                    constantOther: colors.constantLibrary?.asXcodeColor,
+                    typeNameOther: colors.typeNameLibrary?.asXcodeColor,
+                    instanceVariableOther: colors.variableAndGlobalLibrary?.asXcodeColor,
+                    preprocessorMacroOther: colors.preprocessor?.asXcodeColor
                 )
             )
         )
@@ -81,6 +78,47 @@ struct XcodeTheme: Theme {
     }
 }
 
+// MARK: - Xcode Color Model
+
+extension XcodeTheme {
+    struct Color: Codable {
+        let rawColor: NSColor
+
+        var plistString: String {
+            // Xcode uses generic RGB for rendering the colors
+            let color = rawColor.usingColorSpace(.genericRGB) ?? rawColor
+            return "\(color.redComponent) \(color.greenComponent) \(color.blueComponent) \(color.alphaComponent)"
+        }
+
+        var hexString: String {
+            rawColor.hexString
+        }
+
+        init(rawColor: NSColor) {
+            self.rawColor = rawColor
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            let rawString = try container.decode(String.self)
+
+            let components = rawString.components(separatedBy: .whitespaces)
+
+            rawColor = NSColor(
+                red: CGFloat((components[0] as NSString).doubleValue),
+                green: CGFloat((components[1] as NSString).doubleValue),
+                blue: CGFloat((components[2] as NSString).doubleValue),
+                alpha: CGFloat((components[3] as NSString).doubleValue)
+            )
+        }
+
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.singleValueContainer()
+            try container.encode(plistString)
+        }
+    }
+}
+
 // MARK: - Theme File Structure Definition
 
 extension XcodeTheme {
@@ -100,13 +138,35 @@ extension XcodeTheme {
             case syntaxColors = "DVTSourceTextSyntaxColors"
         }
 
-        let background: String
-        let currentLineBackground: String?
-        let selection: String?
-        let cursor: String?
-        let invisibles: String?
+        let background: Color
+        let currentLineBackground: Color?
+        let selection: Color?
+        let cursor: Color?
+        let invisibles: Color?
 
         let syntaxColors: SyntaxColors
+
+        func printValues(_ object: Any? = nil) {
+            let mirror = Mirror(reflecting: object ?? self)
+
+            print("\(mirror.subjectType) [")
+
+            mirror.children.forEach {
+                guard let label = $0.label else { return }
+
+                if $0.value is SyntaxColors {
+                    printValues($0.value)
+                } else {
+                    switch $0.value {
+                    case Optional<Any>.none: print("    \(label): <default>")
+                    case let color as Color: print("    \(label): \(color.hexString)")
+                    default: break
+                    }
+                }
+            }
+
+            print("]")
+        }
     }
 
     struct SyntaxColors: Codable {
@@ -169,31 +229,31 @@ extension XcodeTheme {
             case preprocessorMacroOther = "xcode.syntax.identifier.macro.system"
         }
 
-        let text: String?
-        let comment: String?
-        let documentation: String?
-        let documentationKeyword: String?
-        let mark: String?
-        let string: String?
-        let character: String?
-        let number: String?
-        let keyword: String?
-        let preprocessor: String?
-        let url: String?
-        let attribute: String?
-        let declarationType: String?
-        let declarationOther: String?
-        let classNameProject: String?
-        let functionNameProject: String?
-        let constantProject: String?
-        let typeNameProject: String?
-        let instanceVariableProject: String?
-        let preprocessorMacroProject: String?
-        let classNameOther: String?
-        let functionNameOther: String?
-        let constantOther: String?
-        let typeNameOther: String?
-        let instanceVariableOther: String?
-        let preprocessorMacroOther: String?
+        let text: Color?
+        let comment: Color?
+        let documentation: Color?
+        let documentationKeyword: Color?
+        let mark: Color?
+        let string: Color?
+        let character: Color?
+        let number: Color?
+        let keyword: Color?
+        let preprocessor: Color?
+        let url: Color?
+        let attribute: Color?
+        let declarationType: Color?
+        let declarationOther: Color?
+        let classNameProject: Color?
+        let functionNameProject: Color?
+        let constantProject: Color?
+        let typeNameProject: Color?
+        let instanceVariableProject: Color?
+        let preprocessorMacroProject: Color?
+        let classNameOther: Color?
+        let functionNameOther: Color?
+        let constantOther: Color?
+        let typeNameOther: Color?
+        let instanceVariableOther: Color?
+        let preprocessorMacroOther: Color?
     }
 }
