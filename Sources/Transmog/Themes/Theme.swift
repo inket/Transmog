@@ -53,7 +53,6 @@ struct Colors {
     let character: NSColor?
     let number: NSColor?
     let keyword: NSColor?
-    let variable: NSColor?
 
     let preprocessor: NSColor?
 
@@ -63,8 +62,10 @@ struct Colors {
     let functionNameProject: NSColor?
     let constantProject: NSColor?
     let typeNameProject: NSColor?
+    let variableAndGlobalProject: NSColor?
     let classNameLibrary: NSColor?
     let functionNameLibrary: NSColor?
     let constantLibrary: NSColor?
     let typeNameLibrary: NSColor?
+    let variableAndGlobalLibrary: NSColor?
 }

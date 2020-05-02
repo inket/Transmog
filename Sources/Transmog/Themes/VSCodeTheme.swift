@@ -26,6 +26,9 @@ extension NSColor {
     }
 }
 
+// Resources:
+// https://macromates.com/manual/en/language_grammars
+
 struct VSCodeTheme: Theme {
     let content: Content
 
@@ -38,31 +41,83 @@ struct VSCodeTheme: Theme {
         let defaultBackground: NSColor = isDarkTheme ? .black : .white
         let defaultForeground: NSColor = isDarkTheme ? .white : .black
 
+        // vscode/src/vs/editor/common/view/editorColorRegistry.ts
+        let defaultCursorColor: NSColor = isDarkTheme ? (NSColor(hexString: "#AEAFAD") ?? .white) : .black
+
+        // Naming conventions: https://macromates.com/manual/en/language_grammars
         return Colors(
-            background: color(forKey: "editor.background") ?? defaultBackground,
-            currentLineBackground: color(forKey: "editor.lineHighlightBackground"),
-            selection: color(forKey: "editor.selectionBackground"),
-            cursor: color(forKey: "editorCursor.foreground"),
-            invisibles: color(forKey: "editorWhitespace.foreground"),
-            text: color(forKey: "editor.foreground") ?? color(forKey: "foreground") ?? defaultForeground,
-            comment: color(forKey: "comment"),
-            documentation: color(forKey: "comment"),
-            string: color(forKey: "string.quoted") ?? color(forKey: "string"),
-            character: color(forKey: "constant.character"),
-            number: color(forKey: "constant.numeric") ?? color(forKey: "constant.character.numeric"),
-            keyword: color(forKey: "keyword.other") ?? color(forKey: "keyword"),
-            variable: color(forKey: "variable") ?? color(forKey: "variable.other"),
-            preprocessor: color(forKey: "entity.name.function.preprocessor.cpp"),
-            declarationType: color(forKey: "storage.type"),
-            declarationOther: color(forKey: "entity.name.function") ?? color(forKey: "storage"),
-            classNameProject: color(forKey: "entity.name.class"),
-            functionNameProject: color(forKey: "entity.name.function") ?? color(forKey: "variable.function"),
-            constantProject: color(forKey: "entity.name.constant") ?? color(forKey: "variable.other.constant"),
-            typeNameProject: color(forKey: "entity.name.type"),
-            classNameLibrary: color(forKey: "support.class"),
-            functionNameLibrary: color(forKey: "support.function"),
-            constantLibrary: color(forKey: "support.constant") ?? color(forKey: "constant.language"),
-            typeNameLibrary: color(forKey: "support.type")
+            background: color("editor.background") ?? defaultBackground,
+            currentLineBackground: color("editor.lineHighlightBackground"),
+            selection: color("editor.selectionBackground"),
+            cursor: color("editorCursor.foreground") ?? defaultCursorColor,
+            invisibles: color("editorWhitespace.foreground"),
+            text: color(["editor.foreground", "foreground"]) ?? defaultForeground,
+            comment: color("comment~"),
+            documentation: color([
+                "comment.block.documentation~",
+                "comment.block~",
+                "comment~"
+            ]),
+            string: color([
+                "string.quoted",
+                "string",
+                "string.quoted.",
+                "string."
+            ]),
+            character: color([
+                "constant.character",
+                "constant"
+            ]),
+            number: color([
+                "constant.numeric",
+                "constant.character.numeric",
+                "constant",
+                "constant.numeric.",
+                "constant.character.numeric.",
+                "constant."
+            ]),
+            keyword: color([
+                "keyword.control",
+                "keyword.other",
+                "keyword",
+                "keyword.control.",
+                "keyword.other.",
+                "keyword.",
+                "storage~"
+            ]),
+            preprocessor: color([
+                "entity.name.function.preprocessor~",
+                "entity.name.type~"
+            ]),
+            declarationType: color("entity.name.type~"),
+            declarationOther: color("entity.name.function~"),
+            classNameProject: color([
+                "variable.other.constant~",
+                "variable.other~",
+                "variable"
+            ]),
+            functionNameProject: color([
+                "variable.function~",
+                "variable"
+            ]),
+            constantProject: color([
+                "entity.name.constant~",
+                "variable.other.constant~",
+            ]),
+            typeNameProject: color([
+                "variable.other.constant~",
+                "variable.other~",
+                "variable"
+            ]),
+            variableAndGlobalProject: color(["variable", "variable.other~"]),
+            classNameLibrary: color("support.class~"),
+            functionNameLibrary: color("support.function~"),
+            constantLibrary: color(["support.constant~", "constant.language~"]),
+            typeNameLibrary: color("support.type~"),
+            variableAndGlobalLibrary: color([
+                "support.variable~",
+                "support~"
+            ])
         )
     }
 
@@ -82,15 +137,60 @@ struct VSCodeTheme: Theme {
     func dataForSaving() throws -> Data {
         try JSONEncoder().encode(content)
     }
+}
 
-    private func color(forKey key: String) -> NSColor? {
+// MARK: - Color Lookup
+
+extension VSCodeTheme {
+    /**
+     Key syntax:
+     * "key" for exact match
+     * "key." for prefix matching (every key that starts with "key.")
+     * "key~" for exact match followed by prefix matching if not found ("key", then "key.")
+    */
+    fileprivate func color(_ keys: [String]) -> NSColor? {
+        for key in keys {
+            if let color = color(key) {
+                return color
+            }
+        }
+
+        return nil
+    }
+
+    /**
+     Key syntax:
+     * "key" for exact match
+     * "key." for prefix matching (every key that starts with "key.")
+     * "key~" for exact match followed by prefix matching if not found ("key", then "key.")
+    */
+    fileprivate func color(_ key: String) -> NSColor? {
+        if key.hasSuffix("~") {
+            // Expand "key~" into "key" and "key."
+            return color(rawKey: key.replacingOccurrences(of: "~", with: ""))
+                ?? color(rawKey: key.replacingOccurrences(of: "~", with: "."))
+        } else {
+            return color(rawKey: key)
+        }
+    }
+
+    private func color(rawKey key: String) -> NSColor? {
         let hex: String
+        let prefixSearch = key.hasSuffix(".")
 
+        // Search for it within the main colors
         if let foundColor = content.colors[key].flatMap({ $0 }) {
             hex = foundColor
         } else {
+            // Search for it within the token colors, in the scope parameter of each token color
             let tokenColor = content.tokenColors.first {
-                $0.scope?.array.contains(key) == true
+                $0.scope?.array.contains { scope in
+                    if prefixSearch {
+                        return scope.hasPrefix(key)
+                    } else {
+                        return scope == key
+                    }
+                } ?? false
             }
 
             if let color = tokenColor?.settings["foreground"] {

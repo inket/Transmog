@@ -12,6 +12,9 @@ extension NSColor {
     }
 }
 
+// Resources:
+// https://touchwonders.com/blog/a-closer-look-at-xcode-themes
+
 struct XcodeTheme: Theme {
     static func from(_ colors: Colors) -> XcodeTheme? {
         let background = colors.background.asXcodeColor
