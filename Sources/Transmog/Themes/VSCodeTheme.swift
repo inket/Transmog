@@ -193,7 +193,7 @@ extension VSCodeTheme {
                 } ?? false
             }
 
-            if let color = tokenColor?.settings["foreground"] {
+            if let color = tokenColor?.settings?["foreground"] {
                 hex = color
             } else {
                 return nil
@@ -222,6 +222,6 @@ extension VSCodeTheme {
     struct TokenColor: Codable {
         let name: String?
         let scope: ArrayOrObject<String>?
-        let settings: [String: String]
+        let settings: [String: String]?
     }
 }
