@@ -9,8 +9,8 @@ let package = Package(
         .executable(name: "transmog", targets: ["Transmog"])
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "0.0.1"),
-        .package(url: "https://github.com/thii/SwiftHEXColors", from: "1.4.0")
+        .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMajor(from: "0.4.0")),
+        .package(url: "https://github.com/thii/SwiftHEXColors", .upToNextMajor(from: "1.4.0")),
     ],
     targets: [
         .target(

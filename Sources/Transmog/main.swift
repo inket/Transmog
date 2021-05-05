@@ -17,20 +17,18 @@ struct Transmog: ParsableCommand {
     )
 
     @Argument(
-        // default: "~/Desktop/theme.json", // uncomment for testing within Xcode
         help: ArgumentHelp(
             "Path or URL of the VSCode theme file (.json). GitHub links are also supported.",
             valueName: "theme-file-path-or-url"
         )
     )
-    var pathOrURL: String
+    var pathOrURL: String // = "~/Desktop/theme.json" // uncomment default value for testing within Xcode
 
     @Option(
         name: .shortAndLong,
-        default: "~/Library/Developer/Xcode/UserData/FontAndColorThemes/",
         help: "Output directory path (optional)"
     )
-    var output: String
+    var output: String = "~/Library/Developer/Xcode/UserData/FontAndColorThemes/"
 
     @Flag(
         name: .shortAndLong,
@@ -39,7 +37,7 @@ struct Transmog: ParsableCommand {
         This will cause theme colors to look different in Xcode from what they appear like in VSCode.
         """
     )
-    var skipColorProfileCorrection: Bool
+    var skipColorProfileCorrection: Bool = false
 
     func run() throws {
         ConversionParameters.skipColorProfileCorrection = skipColorProfileCorrection
