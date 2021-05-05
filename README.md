@@ -23,6 +23,9 @@ Or from a URL:
 ```sh
 $ transmog https://github.com/liviuschera/noctis/blob/master/themes/azureus.json
 Saved as "(t)Noctis Azureus"
+
+$ transmog https://marketplace.visualstudio.com/items?itemName=mariorodeghiero.vue-theme
+Saved as "(t)vue-theme"
 ```
 
 ## A few examples

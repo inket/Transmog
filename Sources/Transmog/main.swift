@@ -18,7 +18,7 @@ struct Transmog: ParsableCommand {
 
     @Argument(
         help: ArgumentHelp(
-            "Path or URL of the VSCode theme file (.json). GitHub links are also supported.",
+            "Path or URL of the VSCode theme file (.json). GitHub and VS Marketplace links are also supported.",
             valueName: "theme-file-path-or-url"
         )
     )
@@ -39,9 +39,25 @@ struct Transmog: ParsableCommand {
     )
     var skipColorProfileCorrection: Bool = false
 
+    @Flag(name: .shortAndLong) var verbose: Bool = false
+
     func run() throws {
         ConversionParameters.skipColorProfileCorrection = skipColorProfileCorrection
 
+        if let themeJSONURLs = VSMarketplace.themeJSONURLs(fromMarketplaceURL: pathOrURL) {
+            for themeJSONURL in themeJSONURLs {
+                do {
+                    try convertThemeFile(pathOrURL: themeJSONURL.path)
+                } catch let error {
+                    print(error)
+                }
+            }
+        } else {
+            try convertThemeFile(pathOrURL: pathOrURL)
+        }
+    }
+    
+    func convertThemeFile(pathOrURL: String) throws {
         // Load the theme file
         let vscodeTheme = try VSCodeTheme.read(fromPathOrURL: pathOrURL)
 
@@ -50,7 +66,9 @@ struct Transmog: ParsableCommand {
             throw TransmogError.couldNotCreateTheme
         }
 
-        xcodeTheme.content.printValues()
+        if verbose {
+            xcodeTheme.content.printValues()
+        }
 
         // Figure out the theme name
         var themeName = vscodeTheme.content.name ?? pathOrURL.lastPathComponentWithoutPathExtension
