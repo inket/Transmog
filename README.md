@@ -1,6 +1,8 @@
 # Transmog
 
-Transmog is a command-line tool for converting Visual Studio Code (VSCode) themes into Xcode themes.
+Transmog is a command-line tool for converting Visual Studio Code (VS Code) themes into Xcode themes.
+
+You can many VS Code themes in the [Visual Studio Marketplace](https://marketplace.visualstudio.com/search?term=tag%3Acolor-theme&target=VSCode&category=All%20categories&sortBy=Relevance)
 
 ## Install
 
